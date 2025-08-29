@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATK UIN Ponorogo - Sistem Permintaan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .shopee-gradient { background: linear-gradient(135deg, #ee4d2d, #ff6b35); }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .slide-up { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen shopee-gradient flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md slide-up">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <span class="text-white text-2xl font-bold">ATK</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Sistem Permintaan ATK</h1>
+                <p class="text-gray-600">UIN Ponorogo</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Masukkan username">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Masukkan password">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Login Sebagai</label>
+                    <select id="userRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="user">User (Fakultas/Unit/Lembaga)</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
+                    Masuk
+                </button>
+                
+                <!-- Login Info -->
+                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 class="text-sm font-semibold text-blue-800 mb-2">💡 Info Login:</h4>
+                    <div class="text-xs text-blue-700 space-y-1">
+                        <p><strong>Admin:</strong> username: admin, password: admin123</p>
+                        <p><strong>User:</strong> Gunakan akun yang dibuat oleh admin</p>
+                        <p class="mt-2"><strong>🔗 Terhubung ke Google Spreadsheet</strong></p>
+                        <p class="text-green-600">✅ Real-time data sync</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="userDashboard" class="hidden">
+        <!-- Header -->
+        <header class="shopee-gradient text-white p-4 sticky top-0 z-50">
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold">ATK</span>
+                    </div>
+                    <h1 class="text-xl font-bold">ATK UIN Ponorogo</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="cartBtn" class="relative p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 21a2 2 0 100-4 2 2 0 000 4zm-8 0a2 2 0 100-4 2 2 0 000 4z"></path>
+                        </svg>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </button>
+                    <button id="logoutBtn" class="bg-white bg-opacity-20 px-4 py-2 rounded-lg hover:bg-opacity-30 transition">
+                        Keluar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm border-b">
+            <div class="container mx-auto px-4">
+                <div class="flex space-x-8">
+                    <button class="nav-btn py-4 px-2 border-b-2 border-orange-500 text-orange-500 font-medium" data-tab="catalog">
+                        Katalog ATK
+                    </button>
+                    <button class="nav-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="history">
+                        Riwayat Permintaan
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Catalog Tab -->
+        <div id="catalogTab" class="container mx-auto p-4">
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Katalog ATK</h2>
+                    <div class="flex items-center space-x-4">
+                        <input type="text" id="searchInput" placeholder="Cari barang..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            <option value="">Semua Kategori</option>
+                            <option value="Alat Tulis">Alat Tulis</option>
+                            <option value="Kertas">Kertas</option>
+                            <option value="Elektronik">Elektronik</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="historyTab" class="container mx-auto p-4 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Riwayat Permintaan</h2>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <span class="text-sm text-blue-700 font-medium">🔒 Data Privat Unit Anda</span>
+                    </div>
+                </div>
+            </div>
+            <div id="historyList" class="space-y-4">
+                <!-- History items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden">
+        <!-- Admin Header -->
+        <header class="shopee-gradient text-white p-4">
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold">ATK</span>
+                    </div>
+                    <h1 class="text-xl font-bold">Admin Panel - ATK UIN Ponorogo</h1>
+                </div>
+                <button id="adminLogoutBtn" class="bg-white bg-opacity-20 px-4 py-2 rounded-lg hover:bg-opacity-30 transition">
+                    Keluar
+                </button>
+            </div>
+        </header>
+
+        <!-- Admin Navigation -->
+        <nav class="bg-white shadow-sm border-b">
+            <div class="container mx-auto px-4">
+                <div class="flex space-x-8">
+                    <button class="admin-nav-btn py-4 px-2 border-b-2 border-orange-500 text-orange-500 font-medium" data-tab="dashboard">
+                        Dashboard
+                    </button>
+                    <button class="admin-nav-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="requests">
+                        Riwayat Pengajuan
+                    </button>
+                    <button class="admin-nav-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="stock">
+                        Manajemen Stok
+                    </button>
+                    <button class="admin-nav-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="users">
+                        Manajemen User
+                    </button>
+                    <button class="admin-nav-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="reports">
+                        Laporan
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Admin Dashboard Tab -->
+        <div id="adminDashboardTab" class="container mx-auto p-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Total Permintaan</p>
+                            <p id="totalRequestsCount" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Disetujui</p>
+                            <p id="approvedRequestsCount" class="text-2xl font-bold text-green-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Menunggu</p>
+                            <p id="pendingRequestsCount" class="text-2xl font-bold text-yellow-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Ditolak</p>
+                            <p id="rejectedRequestsCount" class="text-2xl font-bold text-red-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Statistik Permintaan</h3>
+                    <div class="w-full h-64">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Stok Barang Terbatas</h3>
+                    <div id="lowStockItems" class="space-y-3">
+                        <!-- Low stock items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Permintaan Terbaru</h3>
+                <div id="recentRequests" class="space-y-3">
+                    <!-- Recent requests will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Requests Tab -->
+        <div id="adminRequestsTab" class="container mx-auto p-4 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Riwayat Pengajuan</h2>
+            <div id="adminRequestsList" class="space-y-4">
+                <!-- Admin requests will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Admin Stock Tab -->
+        <div id="adminStockTab" class="container mx-auto p-4 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Manajemen Stok</h2>
+                <button id="addStockBtn" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                    Tambah Barang
+                </button>
+            </div>
+            <div id="stockList" class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <!-- Stock items will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Admin Users Tab -->
+        <div id="adminUsersTab" class="container mx-auto p-4 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Manajemen User</h2>
+                <button id="addUserBtn" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                    Tambah User
+                </button>
+            </div>
+            <div id="usersList" class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <!-- Users will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Admin Reports Tab -->
+        <div id="adminReportsTab" class="container mx-auto p-4 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Laporan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Laporan Bulanan</h3>
+                    <p class="text-gray-600 mb-4">Download laporan permintaan ATK bulan ini</p>
+                    <button id="downloadMonthlyReport" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                        Download PDF
+                    </button>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Laporan Tahunan</h3>
+                    <p class="text-gray-600 mb-4">Download laporan permintaan ATK tahun ini</p>
+                    <button id="downloadYearlyReport" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                        Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold">Keranjang Belanja</h3>
+                    <button id="closeCartModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 overflow-y-auto max-h-96">
+                <div id="cartItems" class="space-y-4">
+                    <!-- Cart items will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="p-6 border-t">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Alasan Kebutuhan</label>
+                    <textarea id="reasonInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" rows="3" placeholder="Jelaskan alasan kebutuhan ATK ini..."></textarea>
+                </div>
+                <button id="checkoutBtn" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Letter Modal -->
+    <div id="approvalModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col">
+            <!-- Header - Fixed -->
+            <div class="p-6 border-b bg-white flex-shrink-0">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-gray-800">📋 Lembar Persetujuan ATK</h3>
+                    <button id="closeApprovalModal" class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content - Scrollable -->
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <div id="approvalLetter" class="bg-white p-8 rounded-lg shadow-sm border max-w-4xl mx-auto">
+                    <!-- Approval letter content will be generated here -->
+                </div>
+            </div>
+            
+            <!-- Footer - Fixed -->
+            <div class="p-6 border-t bg-white flex-shrink-0">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="printApprovalBtn" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition flex items-center justify-center space-x-2 font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        <span>🖨️ Print Langsung</span>
+                    </button>
+                    <button id="downloadApprovalBtn" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center justify-center space-x-2 font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>📄 Download PDF</span>
+                    </button>
+                </div>
+                <p class="text-center text-sm text-gray-500 mt-3">💡 Tip: Scroll ke atas/bawah untuk melihat seluruh dokumen</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybSlWqCejUoA5O4QbtWRltr3p1jPHjyyIgXibL2qmclPZiHiROezyeoTInlT0teEvBRA/exec';
+        
+        // Global variables
+        let products = [];
+        let users = [];
+        let requests = [];
+        let adminRequests = [];
+        let cart = [];
+        let isLoading = false;
+        
+        // API Helper Function
+        async function apiCall(action, data = {}) {
+            if (isLoading) return { success: false, error: 'Request in progress' };
+            
+            isLoading = true;
+            showLoading(true);
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', action);
+                
+                Object.keys(data).forEach(key => {
+                    if (data[key] !== null && data[key] !== undefined) {
+                        formData.append(key, data[key]);
+                    }
+                });
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log(`API Call ${action}:`, result); // Debug log
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                return { success: false, error: 'Koneksi ke server gagal. Periksa internet Anda.' };
+            } finally {
+                isLoading = false;
+                showLoading(false);
+            }
+        }
+        
+        // Loading indicator
+        function showLoading(show) {
+            let loader = document.getElementById('globalLoader');
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.id = 'globalLoader';
+                loader.className = 'fixed top-4 right-4 bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center space-x-2';
+                loader.innerHTML = `
+                    <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Loading...</span>
+                `;
+                document.body.appendChild(loader);
+            }
+            loader.style.display = show ? 'flex' : 'none';
+        }
+
+        // Authentication - FIXED
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('userRole').value;
+
+            if (!username || !password) {
+                alert('❌ Username dan password harus diisi!');
+                return;
+            }
+
+            // Call login API
+            const result = await apiCall('login', { username, password, role });
+            
+            if (result.success) {
+                window.currentUser = result.user;
+                
+                // FIXED: Better admin detection
+                const isAdmin = (username === 'admin' && password === 'admin123') || 
+                               (role === 'admin' && result.user && result.user.username === 'admin') ||
+                               (result.user && result.user.role === 'admin');
+                
+                console.log('Login result:', result);
+                console.log('Is admin:', isAdmin);
+                console.log('Selected role:', role);
+                
+                if (isAdmin) {
+                    // Set admin role explicitly
+                    window.currentUser.role = 'admin';
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    await initAdminDashboard();
+                    alert('✅ Selamat datang, Administrator!');
+                } else {
+                    // Set user role explicitly
+                    window.currentUser.role = 'user';
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('userDashboard').classList.remove('hidden');
+                    await loadProducts();
+                    await loadHistory();
+                    updateUserHeader();
+                    alert(`✅ Selamat datang, ${result.user.name || username}!`);
+                }
+            } else {
+                alert('❌ Login gagal: ' + (result.error || 'Username atau password salah'));
+            }
+        });
+
+        // Update user header with current user info
+        function updateUserHeader() {
+            if (window.currentUser && window.currentUser.role === 'user') {
+                const headerTitle = document.querySelector('#userDashboard header h1');
+                if (headerTitle) {
+                    headerTitle.textContent = `ATK UIN Ponorogo - ${window.currentUser.name}`;
+                }
+                
+                const headerContainer = document.querySelector('#userDashboard header .container');
+                if (headerContainer) {
+                    const existingUserInfo = headerContainer.querySelector('.user-info');
+                    if (existingUserInfo) {
+                        existingUserInfo.remove();
+                    }
+                    
+                    const userInfoDiv = document.createElement('div');
+                    userInfoDiv.className = 'user-info hidden md:block text-right text-sm mr-4';
+                    userInfoDiv.innerHTML = `
+                        <p class="text-white opacity-90">Masuk sebagai:</p>
+                        <p class="text-white font-semibold">${window.currentUser.name}</p>
+                        <p class="text-white opacity-75 text-xs">${window.currentUser.type}</p>
+                    `;
+                    
+                    const buttonsContainer = headerContainer.querySelector('.flex.items-center.space-x-4');
+                    if (buttonsContainer) {
+                        headerContainer.insertBefore(userInfoDiv, buttonsContainer);
+                    }
+                }
+            }
+        }
+
+        // Logout handlers
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('adminLogoutBtn').addEventListener('click', logout);
+
+        function logout() {
+            window.currentUser = null;
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('userDashboard').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+            cart = [];
+            updateCartCount();
+            alert('👋 Anda telah keluar dari sistem. Terima kasih!');
+        }
+
+        // User Dashboard Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                
+                document.querySelectorAll('.nav-btn').forEach(b => {
+                    b.classList.remove('border-orange-500', 'text-orange-500');
+                    b.classList.add('border-transparent', 'text-gray-500');
+                });
+                this.classList.add('border-orange-500', 'text-orange-500');
+                this.classList.remove('border-transparent', 'text-gray-500');
+
+                document.getElementById('catalogTab').classList.toggle('hidden', tab !== 'catalog');
+                document.getElementById('historyTab').classList.toggle('hidden', tab !== 'history');
+                
+                if (tab === 'history') {
+                    loadHistory();
+                }
+            });
+        });
+
+        // Admin Dashboard Navigation
+        document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                
+                document.querySelectorAll('.admin-nav-btn').forEach(b => {
+                    b.classList.remove('border-orange-500', 'text-orange-500');
+                    b.classList.add('border-transparent', 'text-gray-500');
+                });
+                this.classList.add('border-orange-500', 'text-orange-500');
+                this.classList.remove('border-transparent', 'text-gray-500');
+
+                document.getElementById('adminDashboardTab').classList.toggle('hidden', tab !== 'dashboard');
+                document.getElementById('adminRequestsTab').classList.toggle('hidden', tab !== 'requests');
+                document.getElementById('adminStockTab').classList.toggle('hidden', tab !== 'stock');
+                document.getElementById('adminUsersTab').classList.toggle('hidden', tab !== 'users');
+                document.getElementById('adminReportsTab').classList.toggle('hidden', tab !== 'reports');
+
+                if (tab === 'dashboard') {
+                    updateDashboardStats();
+                    loadLowStockItems();
+                    loadRecentRequests();
+                }
+                if (tab === 'requests') loadAdminRequests();
+                if (tab === 'stock') loadStockManagement();
+                if (tab === 'users') loadUsersManagement();
+            });
+        });
+
+        // Load products from Google Spreadsheet
+        async function loadProducts() {
+            const result = await apiCall('getProducts');
+            
+            if (result.success) {
+                products = result.products || [];
+                displayProducts(products);
+            } else {
+                alert('Gagal memuat data produk: ' + (result.error || 'Unknown error'));
+                // Fallback to sample data for demo
+                products = [
+                    { id: 1, name: 'Pulpen Pilot', category: 'Alat Tulis', stock: 50, unit: 'pcs' },
+                    { id: 2, name: 'Pensil 2B', category: 'Alat Tulis', stock: 100, unit: 'pcs' },
+                    { id: 3, name: 'Kertas A4', category: 'Kertas', stock: 25, unit: 'rim' }
+                ];
+                displayProducts(products);
+            }
+        }
+
+        function displayProducts(productsToShow) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = productsToShow.map(product => `
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+                    <div class="p-4">
+                        <div class="w-16 h-16 bg-orange-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                            <div class="w-8 h-8 bg-orange-500 rounded"></div>
+                        </div>
+                        <h3 class="font-semibold text-gray-800 mb-2">${product.name}</h3>
+                        <p class="text-sm text-gray-600 mb-2">Kategori: ${product.category}</p>
+                        <p class="text-sm text-gray-600 mb-2">Satuan: ${product.unit}</p>
+                        <p class="text-sm mb-4 ${product.stock <= 5 ? 'text-red-600 font-semibold' : 'text-gray-600'}">
+                            Stok: ${product.stock} ${product.unit} ${product.stock <= 5 ? '(Stok Terbatas!)' : ''}
+                        </p>
+                        <button 
+                            onclick="addToCart(${product.id})" 
+                            class="w-full py-2 rounded-lg transition duration-200 ${
+                                product.stock <= 0 
+                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                                : 'bg-orange-500 text-white hover:bg-orange-600'
+                            }"
+                            ${product.stock <= 0 ? 'disabled' : ''}
+                        >
+                            ${product.stock <= 0 ? 'Stok Habis' : 'Tambah ke Keranjang'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart functionality
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (product.stock <= 0) {
+                alert('Stok barang habis!');
+                return;
+            }
+            
+            const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+            if (currentQuantityInCart >= product.stock) {
+                alert(`Tidak dapat menambah lagi. Stok tersedia: ${product.stock}`);
+                return;
+            }
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        // Cart modal
+        document.getElementById('cartBtn').addEventListener('click', function() {
+            document.getElementById('cartModal').classList.remove('hidden');
+            loadCartItems();
+        });
+
+        document.getElementById('closeCartModal').addEventListener('click', function() {
+            document.getElementById('cartModal').classList.add('hidden');
+        });
+
+        function loadCartItems() {
+            const cartItems = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-500 text-center">Keranjang kosong</p>';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between p-4 border rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <div class="w-6 h-6 bg-orange-500 rounded"></div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">${item.name}</h4>
+                            <p class="text-sm text-gray-600">Satuan: ${item.unit}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateQuantity(${item.id}, -1)" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">-</button>
+                        <span class="w-8 text-center">${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">+</button>
+                        <button onclick="removeFromCart(${item.id})" class="ml-4 text-red-500 hover:text-red-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    loadCartItems();
+                    updateCartCount();
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            loadCartItems();
+            updateCartCount();
+        }
+
+        // Checkout
+        document.getElementById('checkoutBtn').addEventListener('click', async function() {
+            const reason = document.getElementById('reasonInput').value.trim();
+            if (!reason) {
+                alert('Mohon isi alasan kebutuhan');
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('Keranjang kosong');
+                return;
+            }
+
+            // Check stock availability
+            for (let cartItem of cart) {
+                const product = products.find(p => p.id === cartItem.id);
+                if (product.stock < cartItem.quantity) {
+                    alert(`Stok ${product.name} tidak mencukupi. Stok tersedia: ${product.stock}`);
+                    return;
+                }
+            }
+
+            console.log('Current user for checkout:', window.currentUser);
+            console.log('Cart items:', cart);
+
+            // Submit request to Google Spreadsheet
+            const requestData = {
+                userId: window.currentUser ? (window.currentUser.id || window.currentUser.username) : null,
+                userName: window.currentUser ? window.currentUser.name : 'Unknown',
+                userType: window.currentUser ? (window.currentUser.type || window.currentUser.role) : 'Unknown',
+                userEmail: window.currentUser ? window.currentUser.email : '',
+                username: window.currentUser ? window.currentUser.username : '',
+                items: JSON.stringify(cart.map(item => `${item.name} x${item.quantity}`)),
+                cartItems: JSON.stringify(cart),
+                reason: reason,
+                status: 'Menunggu'
+            };
+
+            console.log('Sending request data:', requestData);
+
+            const result = await apiCall('addRequest', requestData);
+            
+            console.log('Checkout result:', result);
+            
+            if (result.success) {
+                // Update local stock
+                cart.forEach(cartItem => {
+                    const product = products.find(p => p.id === cartItem.id);
+                    if (product) {
+                        product.stock -= cartItem.quantity;
+                    }
+                });
+
+                // Clear cart
+                cart = [];
+                updateCartCount();
+                document.getElementById('cartModal').classList.add('hidden');
+                document.getElementById('reasonInput').value = '';
+                
+                // Reload displays
+                displayProducts(products);
+                
+                alert('✅ Permintaan berhasil diajukan! Stok telah dikurangi sesuai permintaan.');
+                
+                // Reload history after successful submission
+                setTimeout(() => {
+                    loadHistory();
+                }, 1000);
+            } else {
+                console.error('Checkout failed:', result);
+                alert('❌ Gagal mengajukan permintaan: ' + (result.error || 'Unknown error'));
+            }
+        });
+
+        // Load history from Google Spreadsheet - FIXED
+        async function loadHistory() {
+            if (!window.currentUser) {
+                console.log('No current user found');
+                return;
+            }
+            
+            console.log('Loading history for user:', window.currentUser);
+            
+            const result = await apiCall('getRequests', { 
+                userId: window.currentUser.id || window.currentUser.username,
+                username: window.currentUser.username || window.currentUser.name,
+                userType: window.currentUser.type || window.currentUser.role
+            });
+            
+            console.log('History API result:', result); // Debug log
+            
+            const historyList = document.getElementById('historyList');
+            
+            if (result.success && result.requests && result.requests.length > 0) {
+                historyList.innerHTML = result.requests.map(request => {
+                    // FIXED: Better parsing of items data
+                    let itemsList = [];
+                    if (typeof request.items === 'string') {
+                        try {
+                            // Try to parse as JSON first
+                            itemsList = JSON.parse(request.items);
+                        } catch (e) {
+                            // If not JSON, split by comma or use as single item
+                            itemsList = request.items.split(',').map(item => item.trim());
+                        }
+                    } else if (Array.isArray(request.items)) {
+                        itemsList = request.items;
+                    } else {
+                        itemsList = ['Data barang tidak tersedia'];
+                    }
+                    
+                    return `
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Permintaan #${request.id || 'N/A'}</h3>
+                                <p class="text-sm text-gray-600">${request.date || 'Tanggal tidak tersedia'}</p>
+                                <p class="text-xs text-gray-500 mt-1">🏢 ${request.userName || window.currentUser.name || 'Unit tidak dikenal'}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${getStatusClass(request.status || 'Menunggu')}">
+                                ${request.status || 'Menunggu'}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-2">Barang yang diminta:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-800">
+                                ${itemsList.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-1">Alasan:</p>
+                            <p class="text-sm text-gray-800">${request.reason || 'Tidak ada alasan yang diberikan'}</p>
+                        </div>
+                        
+                        <div class="mb-4 p-3 rounded-lg ${getStatusBgClass(request.status || 'Menunggu')}">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium">${getStatusIcon(request.status || 'Menunggu')} Status:</span>
+                                <span class="text-sm">${getStatusDescription(request.status || 'Menunggu')}</span>
+                            </div>
+                        </div>
+                        
+                        ${(request.status === 'Disetujui') ? `
+                            <button onclick="showApprovalLetter('${request.id || ''}')" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                                📄 Cetak Lembar Persetujuan
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                }).join('');
+            } else {
+                console.log('History load result:', result);
+                console.log('Current user:', window.currentUser);
+                
+                historyList.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada riwayat permintaan</h3>
+                        <p class="text-gray-500 mb-4">Anda belum pernah mengajukan permintaan ATK</p>
+                        ${result.error ? `<p class="text-red-500 text-sm mb-4">Debug: ${result.error}</p>` : ''}
+                        <button onclick="switchToCatalogTab()" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                            Mulai Permintaan ATK
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function switchToCatalogTab() {
+            const catalogBtn = document.querySelector('[data-tab="catalog"]');
+            if (catalogBtn) {
+                catalogBtn.click();
+            }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Disetujui': return 'bg-green-100 text-green-800';
+                case 'Ditolak': return 'bg-red-100 text-red-800';
+                case 'Menunggu': return 'bg-yellow-100 text-yellow-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getStatusBgClass(status) {
+            switch(status) {
+                case 'Disetujui': return 'bg-green-50 border border-green-200';
+                case 'Ditolak': return 'bg-red-50 border border-red-200';
+                case 'Menunggu': return 'bg-yellow-50 border border-yellow-200';
+                default: return 'bg-gray-50 border border-gray-200';
+            }
+        }
+
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'Disetujui': return '✅';
+                case 'Ditolak': return '❌';
+                case 'Menunggu': return '⏳';
+                default: return '📋';
+            }
+        }
+
+        function getStatusDescription(status) {
+            switch(status) {
+                case 'Disetujui': return 'Permintaan telah disetujui dan dapat diambil';
+                case 'Ditolak': return 'Permintaan ditolak, hubungi admin untuk info lebih lanjut';
+                case 'Menunggu': return 'Permintaan sedang dalam proses review admin';
+                default: return 'Status tidak dikenal';
+            }
+        }
+
+        // Admin Dashboard
+        let statsChart = null;
+        
+        async function initAdminDashboard() {
+            await updateDashboardStats();
+            await loadLowStockItems();
+            await loadRecentRequests();
+        }
+        
+        async function updateDashboardStats() {
+            console.log('Loading admin dashboard stats...');
+            
+            const result = await apiCall('getAdminRequests');
+            
+            console.log('Admin stats result:', result);
+            
+            if (result.success) {
+                adminRequests = result.requests || [];
+                
+                const totalRequests = adminRequests.length;
+                const approvedRequests = adminRequests.filter(r => r.status === 'Disetujui').length;
+                const pendingRequests = adminRequests.filter(r => r.status === 'Menunggu').length;
+                const rejectedRequests = adminRequests.filter(r => r.status === 'Ditolak').length;
+                
+                document.getElementById('totalRequestsCount').textContent = totalRequests;
+                document.getElementById('approvedRequestsCount').textContent = approvedRequests;
+                document.getElementById('pendingRequestsCount').textContent = pendingRequests;
+                document.getElementById('rejectedRequestsCount').textContent = rejectedRequests;
+                
+                updateStatsChart(approvedRequests, pendingRequests, rejectedRequests);
+            } else {
+                console.error('Failed to load admin stats:', result.error);
+            }
+        }
+        
+        function updateStatsChart(approved, pending, rejected) {
+            const ctx = document.getElementById('statsChart');
+            if (!ctx) return;
+            
+            if (statsChart) {
+                statsChart.destroy();
+            }
+            
+            statsChart = new Chart(ctx.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Disetujui', 'Menunggu', 'Ditolak'],
+                    datasets: [{
+                        data: [approved, pending, rejected],
+                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function loadLowStockItems() {
+            // Use current products data
+            const lowStockProducts = products.filter(product => product.stock <= 10);
+            const lowStockContainer = document.getElementById('lowStockItems');
+            
+            if (lowStockProducts.length === 0) {
+                lowStockContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-600">Semua stok barang mencukupi</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            lowStockContainer.innerHTML = lowStockProducts.map(product => `
+                <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${product.name}</p>
+                            <p class="text-xs text-gray-600">${product.category}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-red-600">${product.stock} ${product.unit}</p>
+                        <p class="text-xs text-red-500">Stok Rendah!</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadRecentRequests() {
+            // Use current adminRequests data
+            const recentRequests = adminRequests
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+            const recentContainer = document.getElementById('recentRequests');
+            
+            if (recentRequests.length === 0) {
+                recentContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="w-12 h-12 bg-gray-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-600">Belum ada permintaan</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            recentContainer.innerHTML = recentRequests.map(request => `
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${request.userName}</p>
+                            <p class="text-xs text-gray-600">#${request.id} - ${request.date}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(request.status)}">
+                            ${request.status}
+                        </span>
+                        <p class="text-xs text-gray-500 mt-1">${(request.items || []).length} item</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Admin requests management
+        async function loadAdminRequests() {
+            console.log('Loading admin requests...');
+            
+            const result = await apiCall('getAdminRequests');
+            const requestsList = document.getElementById('adminRequestsList');
+            
+            console.log('Admin requests result:', result);
+            
+            if (result.success && result.requests) {
+                adminRequests = result.requests;
+                requestsList.innerHTML = adminRequests.map(request => `
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${request.userName}</h3>
+                                <p class="text-sm text-gray-600">Permintaan #${request.id} - ${request.date}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${getStatusClass(request.status)}">
+                                ${request.status}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-2">Barang yang diminta:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-800">
+                                ${(request.items || []).map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-1">Alasan:</p>
+                            <p class="text-sm text-gray-800">${request.reason}</p>
+                        </div>
+                        
+                        ${request.status === 'Menunggu' ? `
+                            <div class="flex space-x-2">
+                                <button onclick="approveRequest(${request.id})" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                                    Setujui
+                                </button>
+                                <button onclick="rejectRequest(${request.id})" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                                    Tolak
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } else {
+                requestsList.innerHTML = '<p class="text-center text-gray-500">Tidak ada permintaan</p>';
+            }
+        }
+
+        async function approveRequest(requestId) {
+            const result = await apiCall('updateRequestStatus', { 
+                requestId: requestId, 
+                status: 'Disetujui' 
+            });
+            
+            if (result.success) {
+                alert('✅ Permintaan telah disetujui');
+                await loadAdminRequests();
+                await updateDashboardStats();
+                await loadRecentRequests();
+            } else {
+                alert('❌ Gagal menyetujui permintaan: ' + (result.error || 'Unknown error'));
+            }
+        }
+
+        async function rejectRequest(requestId) {
+            const result = await apiCall('updateRequestStatus', { 
+                requestId: requestId, 
+                status: 'Ditolak' 
+            });
+            
+            if (result.success) {
+                alert('✅ Permintaan telah ditolak');
+                await loadAdminRequests();
+                await updateDashboardStats();
+                await loadRecentRequests();
+            } else {
+                alert('❌ Gagal menolak permintaan: ' + (result.error || 'Unknown error'));
+            }
+        }
+
+        // Stock management
+        async function loadStockManagement() {
+            // Use current products data
+            const stockList = document.getElementById('stockList');
+            stockList.innerHTML = `
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Satuan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${products.map(product => `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-orange-100 rounded-lg mr-3 flex items-center justify-center">
+                                            <div class="w-5 h-5 bg-orange-500 rounded"></div>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900">${product.name}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.category}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${product.stock} ${product.unit}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${product.unit}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="editStock(${product.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                    <button onclick="deleteStock(${product.id})" class="text-red-600 hover:text-red-900">Hapus</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Add stock button functionality
+        document.getElementById('addStockBtn').addEventListener('click', function() {
+            showAddStockModal();
+        });
+
+        function showAddStockModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg max-w-md w-full p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold">Tambah Barang Baru</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="addStockForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Barang</label>
+                            <input type="text" id="newProductName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Masukkan nama barang" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                            <select id="newProductCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="Alat Tulis">Alat Tulis</option>
+                                <option value="Kertas">Kertas</option>
+                                <option value="Elektronik">Elektronik</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Stok Awal</label>
+                            <input type="number" id="newProductStock" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Masukkan jumlah stok" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Satuan</label>
+                            <select id="newProductUnit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" required>
+                                <option value="">Pilih Satuan</option>
+                                <option value="pcs">Pieces (pcs)</option>
+                                <option value="rim">Rim</option>
+                                <option value="botol">Botol</option>
+                                <option value="pack">Pack</option>
+                                <option value="box">Box</option>
+                                <option value="unit">Unit</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex space-x-3 mt-6">
+                            <button type="button" onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                                Batal
+                            </button>
+                            <button type="submit" class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                                Tambah Barang
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const addStockForm = document.getElementById('addStockForm');
+            if (addStockForm) {
+                addStockForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    addNewProduct();
+                });
+            }
+        }
+
+        async function addNewProduct() {
+            const nameInput = document.getElementById('newProductName');
+            const categoryInput = document.getElementById('newProductCategory');
+            const stockInput = document.getElementById('newProductStock');
+            const unitInput = document.getElementById('newProductUnit');
+            
+            if (!nameInput || !categoryInput || !stockInput || !unitInput) {
+                alert('Error: Form elements tidak ditemukan!');
+                return;
+            }
+            
+            const name = nameInput.value.trim();
+            const category = categoryInput.value;
+            const stock = parseInt(stockInput.value);
+            const unit = unitInput.value;
+            
+            if (!name || !category || isNaN(stock) || stock < 0 || !unit) {
+                alert('Semua field harus diisi dengan benar!');
+                return;
+            }
+            
+            if (products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                alert('Nama barang sudah ada! Gunakan nama yang berbeda.');
+                return;
+            }
+            
+            const result = await apiCall('addProduct', { name, category, stock, unit });
+            
+            if (result.success) {
+                // Add to local products array
+                const newId = Math.max(...products.map(p => p.id), 0) + 1;
+                products.push({ id: newId, name, category, stock, unit });
+                
+                const modal = document.querySelector('.fixed.inset-0');
+                if (modal) modal.remove();
+                
+                loadStockManagement();
+                displayProducts(products);
+                
+                alert(`✅ Barang "${name}" berhasil ditambahkan!\nStok: ${stock} ${unit}`);
+            } else {
+                alert('❌ Gagal menambah barang: ' + (result.error || 'Unknown error'));
+            }
+        }
+
+        async function editStock(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const newStock = prompt(`Edit stok untuk ${product.name}\nStok saat ini: ${product.stock} ${product.unit}\n\nMasukkan stok baru:`, product.stock);
+            
+            if (newStock !== null) {
+                const stock = parseInt(newStock);
+                if (isNaN(stock) || stock < 0) {
+                    alert('Stok harus berupa angka positif!');
+                    return;
+                }
+                
+                const result = await apiCall('updateProductStock', { productId, stock });
+                
+                if (result.success) {
+                    product.stock = stock;
+                    loadStockManagement();
+                    displayProducts(products);
+                    alert(`✅ Stok ${product.name} berhasil diupdate menjadi ${stock} ${product.unit}`);
+                } else {
+                    alert('❌ Gagal update stok: ' + (result.error || 'Unknown error'));
+                }
+            }
+        }
+
+        async function deleteStock(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            if (confirm(`Apakah Anda yakin ingin menghapus "${product.name}" dari daftar barang?\n\nTindakan ini tidak dapat dibatalkan.`)) {
+                const result = await apiCall('deleteProduct', { productId });
+                
+                if (result.success) {
+                    const index = products.findIndex(p => p.id === productId);
+                    if (index > -1) {
+                        products.splice(index, 1);
+                        loadStockManagement();
+                        displayProducts(products);
+                        alert(`✅ Barang "${product.name}" berhasil dihapus.`);
+                    }
+                } else {
+                    alert('❌ Gagal menghapus barang: ' + (result.error || 'Unknown error'));
+                }
+            }
+        }
+
+        // Users management
+        async function loadUsersManagement() {
+            const result = await apiCall('getUsers');
+            const usersList = document.getElementById('usersList');
+            
+            if (result.success && result.users) {
+                users = result.users;
+                usersList.innerHTML = `
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Unit</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${users.map(user => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 bg-blue-100 rounded-lg mr-3 flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                                </svg>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-900">${user.username}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.name}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getUserTypeClass(user.type)}">
+                                            ${user.type}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button onclick="editUser(${user.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                        <button onclick="deleteUser(${user.id})" class="text-red-600 hover:text-red-900">Hapus</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                usersList.innerHTML = '<p class="text-center text-gray-500 p-6">Gagal memuat data users</p>';
+            }
+        }
+
+        function getUserTypeClass(type) {
+            switch(type) {
+                case 'Fakultas': return 'bg-blue-100 text-blue-800';
+                case 'Unit': return 'bg-green-100 text-green-800';
+                case 'Lembaga': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Add user button functionality
+        document.getElementById('addUserBtn').addEventListener('click', function() {
+            showAddUserModal();
+        });
+
+        function showAddUserModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg max-w-md w-full p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold">Tambah User Baru</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="addUserForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                            <input type="text" id="newUsername" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Masukkan username" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input type="password" id="newPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Masukkan password" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Unit/Fakultas/Lembaga</label>
+                            <input type="text" id="newUserName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Contoh: Fakultas Tarbiyah" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipe</label>
+                            <select id="newUserType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" required>
+                                <option value="">Pilih Tipe</option>
+                                <option value="Fakultas">Fakultas</option>
+                                <option value="Unit">Unit</option>
+                                <option value="Lembaga">Lembaga</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="newUserEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Contoh: tarbiyah@uinponorogo.ac.id" required>
+                        </div>
+                        
+                        <div class="flex space-x-3 mt-6">
+                            <button type="button" onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                                Batal
+                            </button>
+                            <button type="submit" class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                                Tambah User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const addUserForm = document.getElementById('addUserForm');
+            if (addUserForm) {
+                addUserForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    addNewUser();
+                });
+            }
+        }
+
+        async function addNewUser() {
+            const usernameInput = document.getElementById('newUsername');
+            const passwordInput = document.getElementById('newPassword');
+            const nameInput = document.getElementById('newUserName');
+            const typeInput = document.getElementById('newUserType');
+            const emailInput = document.getElementById('newUserEmail');
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const name = nameInput.value.trim();
+            const type = typeInput.value;
+            const email = emailInput.value.trim();
+            
+            if (!username || !password || !name || !type || !email) {
+                alert('Semua field harus diisi!');
+                return;
+            }
+            
+            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                alert('Username sudah ada! Gunakan username yang berbeda.');
+                return;
+            }
+            
+            const result = await apiCall('addUser', { username, password, name, type, email });
+            
+            if (result.success) {
+                const modal = document.querySelector('.fixed.inset-0');
+                if (modal) modal.remove();
+                
+                await loadUsersManagement();
+                
+                alert(`✅ User "${username}" berhasil ditambahkan!\n\nInfo Login:\n🏢 ${name}\n📧 ${email}\n\n💡 User dapat login dengan:\nUsername: ${username}\nPassword: ${password}`);
+            } else {
+                alert('❌ Gagal menambah user: ' + (result.error || 'Unknown error'));
+            }
+        }
+
+        async function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            const newPassword = prompt(`Edit password untuk user: ${user.username}\n\nMasukkan password baru:`, user.password);
+            
+            if (newPassword !== null && newPassword.trim()) {
+                const result = await apiCall('updateUserPassword', { userId, password: newPassword.trim() });
+                
+                if (result.success) {
+                    alert(`✅ Password untuk user "${user.username}" berhasil diupdate.`);
+                } else {
+                    alert('❌ Gagal update password: ' + (result.error || 'Unknown error'));
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (confirm(`Apakah Anda yakin ingin menghapus user "${user.username}" (${user.name})?\n\nTindakan ini tidak dapat dibatalkan dan akan menghapus semua riwayat permintaan user tersebut.`)) {
+                const result = await apiCall('deleteUser', { userId });
+                
+                if (result.success) {
+                    await loadUsersManagement();
+                    alert(`✅ User "${user.username}" berhasil dihapus beserta semua riwayat permintaannya.`);
+                } else {
+                    alert('❌ Gagal menghapus user: ' + (result.error || 'Unknown error'));
+                }
+            }
+        }
+
+        // Reports functionality
+        document.getElementById('downloadMonthlyReport').addEventListener('click', function() {
+            generateReport('monthly');
+        });
+
+        document.getElementById('downloadYearlyReport').addEventListener('click', function() {
+            generateReport('yearly');
+        });
+
+        function generateReport(type) {
+            const currentDate = new Date();
+            const reportTitle = type === 'monthly' ? 'Laporan Bulanan' : 'Laporan Tahunan';
+            const period = type === 'monthly' 
+                ? `${currentDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`
+                : `${currentDate.getFullYear()}`;
+            
+            let filteredRequests = adminRequests;
+            if (type === 'monthly') {
+                const currentMonth = currentDate.getMonth();
+                const currentYear = currentDate.getFullYear();
+                filteredRequests = adminRequests.filter(request => {
+                    const requestDate = new Date(request.date);
+                    return requestDate.getMonth() === currentMonth && requestDate.getFullYear() === currentYear;
+                });
+            } else {
+                const currentYear = currentDate.getFullYear();
+                filteredRequests = adminRequests.filter(request => {
+                    const requestDate = new Date(request.date);
+                    return requestDate.getFullYear() === currentYear;
+                });
+            }
+            
+            const totalRequests = filteredRequests.length;
+            const approvedRequests = filteredRequests.filter(r => r.status === 'Disetujui').length;
+            const pendingRequests = filteredRequests.filter(r => r.status === 'Menunggu').length;
+            const rejectedRequests = filteredRequests.filter(r => r.status === 'Ditolak').length;
+            
+            const reportContent = `
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-bold mb-2">UNIVERSITAS ISLAM NEGERI PONOROGO</h1>
+                    <h2 class="text-xl font-semibold mb-4">${reportTitle.toUpperCase()} PERMINTAAN ATK</h2>
+                    <p class="text-lg">Periode: ${period}</p>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4">RINGKASAN STATISTIK</h3>
+                    <table class="w-full border-collapse border border-gray-300 mb-6">
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2 font-semibold bg-gray-50">Total Permintaan</td>
+                            <td class="border border-gray-300 px-4 py-2">${totalRequests}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2 font-semibold bg-gray-50">Disetujui</td>
+                            <td class="border border-gray-300 px-4 py-2 text-green-600">${approvedRequests}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2 font-semibold bg-gray-50">Menunggu</td>
+                            <td class="border border-gray-300 px-4 py-2 text-yellow-600">${pendingRequests}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2 font-semibold bg-gray-50">Ditolak</td>
+                            <td class="border border-gray-300 px-4 py-2 text-red-600">${rejectedRequests}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4">DETAIL PERMINTAAN</h3>
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-4 py-2 text-left">No</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Tanggal</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Unit/Fakultas</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Barang</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredRequests.map((request, index) => `
+                                <tr>
+                                    <td class="border border-gray-300 px-4 py-2">${index + 1}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${request.date}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${request.userName}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${(request.items || []).join(', ')}</td>
+                                    <td class="border border-gray-300 px-4 py-2">${request.status}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-12 text-right">
+                    <p>Ponorogo, ${currentDate.toLocaleDateString('id-ID')}</p>
+                    <p class="mt-16">Admin BMN</p>
+                    <p class="mt-4 border-t border-black inline-block px-12 pt-2">
+                        ( _________________________ )
+                    </p>
+                </div>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${reportTitle} ATK - ${period}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .text-left { text-align: left; }
+                        .font-bold { font-weight: bold; }
+                        .font-semibold { font-weight: 600; }
+                        .mb-2 { margin-bottom: 8px; }
+                        .mb-4 { margin-bottom: 16px; }
+                        .mb-6 { margin-bottom: 24px; }
+                        .mb-8 { margin-bottom: 32px; }
+                        .mt-4 { margin-top: 16px; }
+                        .mt-12 { margin-top: 48px; }
+                        .mt-16 { margin-top: 64px; }
+                        .px-4 { padding-left: 16px; padding-right: 16px; }
+                        .px-12 { padding-left: 48px; padding-right: 48px; }
+                        .py-2 { padding-top: 8px; padding-bottom: 8px; }
+                        .pt-2 { padding-top: 8px; }
+                        .w-full { width: 100%; }
+                        .border { border: 1px solid #d1d5db; }
+                        .border-t { border-top: 1px solid black; }
+                        .border-gray-300 { border-color: #d1d5db; }
+                        .border-black { border-color: black; }
+                        .border-collapse { border-collapse: collapse; }
+                        .bg-gray-50 { background-color: #f9fafb; }
+                        .text-green-600 { color: #059669; }
+                        .text-yellow-600 { color: #d97706; }
+                        .text-red-600 { color: #dc2626; }
+                        .text-lg { font-size: 18px; }
+                        .text-xl { font-size: 20px; }
+                        .text-2xl { font-size: 24px; }
+                        .inline-block { display: inline-block; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #d1d5db; padding: 8px 16px; text-align: left; }
+                        th { background-color: #f9fafb; }
+                        @media print {
+                            body { margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${reportContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterProducts();
+        });
+
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            filterProducts();
+        });
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            
+            const filteredProducts = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                return matchesSearch && matchesCategory;
+            });
+            
+            displayProducts(filteredProducts);
+            
+            if (filteredProducts.length === 0) {
+                const grid = document.getElementById('productGrid');
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada barang ditemukan</h3>
+                        <p class="text-gray-500">Coba ubah kata kunci pencarian atau filter kategori</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Approval letter functionality
+        function showApprovalLetter(requestId) {
+            // This would need to fetch the specific request from the spreadsheet
+            // For now, we'll show a placeholder
+            alert('Fitur lembar persetujuan akan segera tersedia setelah integrasi spreadsheet lengkap.');
+        }
+
+        document.getElementById('closeApprovalModal').addEventListener('click', function() {
+            document.getElementById('approvalModal').classList.add('hidden');
+        });
+
+        document.getElementById('printApprovalBtn').addEventListener('click', function() {
+            const modalButtons = document.querySelector('#approvalModal .p-6.border-t');
+            modalButtons.style.display = 'none';
+            window.print();
+            setTimeout(() => {
+                modalButtons.style.display = 'flex';
+            }, 1000);
+        });
+
+        document.getElementById('downloadApprovalBtn').addEventListener('click', function() {
+            const printWindow = window.open('', '_blank');
+            const approvalContent = document.getElementById('approvalLetter').innerHTML;
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Lembar Persetujuan ATK</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        /* Add necessary styles here */
+                    </style>
+                </head>
+                <body>
+                    ${approvalContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show connection status
+            const connectionStatus = document.createElement('div');
+            connectionStatus.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-3 py-2 rounded-lg text-sm z-50';
+            connectionStatus.innerHTML = '🔗 Terhubung ke Google Spreadsheet';
+            document.body.appendChild(connectionStatus);
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                connectionStatus.style.display = 'none';
+            }, 3000);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'976db92256e1ce3b',t:'MTc1NjQ4ODA2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
